@@ -29,7 +29,7 @@ class ProductFilter extends QueryFilter
     {
         $title = str_replace(" ", "", trim($title));
         if (empty($title)) {
-            return $title;
+            return $query;
         }
         return $query->where('title', "LIKE", "%$title%");
     }
