@@ -113,7 +113,7 @@ export default {
         },
         product: {
             type: Object,
-            required: false
+            required: true
         }
     },
     data() {
@@ -138,6 +138,22 @@ export default {
         }
     },
     methods: {
+        initProduct(){
+            this.product_name = this.product.title;
+            this.product_sku = this.product.sku
+            this.description = this.product.description;
+        },
+        initProductVariant(){
+            this.product_variant_prices = [];
+            this.product.price_variants.forEach(variant => {
+                const style = variant.style === null ? "" : variant.style.variant;
+                this.product_variant_prices.push({
+                    title: `${variant.size.variant}/${variant.color.variant}/${style}`,
+                    price: variant.price,
+                    stock: variant.stock
+                });
+            })
+        },
         // it will push a new object into product variant
         newVariant() {
             let all_variants = this.variants.map(el => el.id)
@@ -206,6 +222,8 @@ export default {
     },
     mounted() {
         console.log('Component mounted.')
+        this.initProduct();
+        this.initProductVariant();
     }
 }
 </script>

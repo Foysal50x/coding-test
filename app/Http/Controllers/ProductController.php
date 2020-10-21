@@ -8,6 +8,8 @@ use App\Models\ProductVariantPrice;
 use App\Models\Variant;
 use App\QueryFilters\ProductFilter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
 {
@@ -38,15 +40,47 @@ class ProductController extends Controller
         return view('products.create', compact('variants'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function store(Request $request)
     {
+        try {
+            DB::transaction(function() use($request){
+                /** @var Product $product */
+                $product = Product::create($request->all());
+                collect($request->input('product_variant'))->each(function($variant) use($product){
+                    $variant_id = $variant['option'];
+                    $variant_array = array_map(function($name) use ($variant_id) {
+                        return ["variant" => $name, "variant_id" => $variant_id];
+                    }, $variant["tags"]);
+                    $product->productVariants()->createMany($variant_array);
 
+                });
+                $id = $product->id;
+                collect($request->input('product_variant_prices'))->each(function($productVariant) use($id){
+                    $array = array_filter(explode('/', $productVariant['title']));
+                    $product_variant_array = [
+                        "price" => $productVariant["price"],
+                        "stock" => $productVariant["stock"],
+                        "product_id" => $id
+                    ];
+                    $match = ["one", "two", "three"];
+                    foreach($array as $key => $variant) {
+                        $pv = ProductVariant::query()->where([
+                            ['product_id', '=', $id],
+                            ['variant', 'LIKE', $variant]
+                        ])->first();
+                        if ($pv) {
+                            $product_variant_array["product_variant_{$match[$key]}"] = $pv->id;
+                        }
+                    }
+                    ProductVariantPrice::create($product_variant_array);
+                });
+            });
+            return Response::json(["success" => true, "message" => "Product create success"]);
+        }catch (\Exception $exception){
+            info($exception->getMessage());
+            Response::json(["success" => false, "message" => $exception->getMessage()]);
+        }
     }
 
 
