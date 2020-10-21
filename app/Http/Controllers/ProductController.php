@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\Variant;
+use App\QueryFilters\ProductFilter;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -13,12 +14,13 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param ProductFilter $filter
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index()
+    public function index(ProductFilter $filter)
     {
         return view('products.index')->with([
-            "products" => Product::with('priceVariants')->paginate(5),
+            "products" => Product::with('priceVariants')->filter($filter)->paginate(5),
             "variants" => Variant::with(['variants' => function($query){
                 return $query->groupBy('variant');
             }])->get()

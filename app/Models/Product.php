@@ -22,7 +22,10 @@ class Product extends Model
         )->withPivot('variant');
     }
 
-
+    public function productVariants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
+    }
 
     public function priceVariants()
     {

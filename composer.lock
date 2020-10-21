@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae0d6d153491ce30c9626f9180956f93",
+    "content-hash": "9fa031058cc1f8595bd4a19ae4cdc4f8",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -427,6 +427,68 @@
                 "validator"
             ],
             "time": "2020-09-26T15:48:38+00:00"
+        },
+        {
+            "name": "faisal50x/query-filter",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Faisal50x/query-filter.git",
+                "reference": "9ffcf79ac87d62536ba9cff1eac668c149febfe5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Faisal50x/query-filter/zipball/9ffcf79ac87d62536ba9cff1eac668c149febfe5",
+                "reference": "9ffcf79ac87d62536ba9cff1eac668c149febfe5",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^5.6|^6.0|^7.0",
+                "illuminate/database": "^5.6|^6.0|^7.0",
+                "illuminate/support": "^5.6|^6.0|^7.0",
+                "php": "^7.1|^7.2"
+            },
+            "require-dev": {
+                "ext-json": "*",
+                "orchestra/testbench": "^4.0",
+                "phpunit/phpunit": "^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Faisal50x\\QueryFilter\\QueryFilterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Faisal50x\\QueryFilter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Faisal Ahmed",
+                    "email": "hello@imfaisal.me",
+                    "homepage": "https://github.com/Faisal50x",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Eloquent models filter based on query parameters.",
+            "homepage": "https://github.com/faisal50x/query-filter",
+            "keywords": [
+                "eloquent",
+                "faisal50x",
+                "filters",
+                "laravel",
+                "query",
+                "query-filter"
+            ],
+            "time": "2020-05-18T10:49:12+00:00"
         },
         {
             "name": "fideloper/proxy",
