@@ -24,7 +24,7 @@
                         <h6 class="m-0 font-weight-bold text-primary">Media</h6>
                     </div>
                     <div class="card-body border">
-                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
+                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-success="uploadSuccess"></vue-dropzone>
                     </div>
                 </div>
             </div>
@@ -130,10 +130,10 @@ export default {
             ],
             product_variant_prices: [],
             dropzoneOptions: {
-                url: 'https://httpbin.org/post',
+                url: '/file/upload',
                 thumbnailWidth: 150,
                 maxFilesize: 0.5,
-                headers: {"My-Awesome-Header": "header value"}
+                headers: {"X-CSRF-TOKEN": document.head.querySelector("[name=csrf-token]").content}
             }
         }
     },
@@ -194,12 +194,28 @@ export default {
 
 
             axios.post('/product', product).then(response => {
-                console.log(response.data);
+                console.log(response)
+                if (response.data.success) {
+                    this.$toasted.success(response.data.message).goAway(1000);
+                    setTimeout(function(){
+                        window.local.reload();
+                    }, 1000)
+                }else {
+                    this.$toasted.error(response.data.message).goAway(1000)
+                }
             }).catch(error => {
+                this.$toasted.error(error.message).goAway(1000)
                 console.log(error);
             })
 
             console.log(product);
+        },
+        uploadSuccess(file, response) {
+            console.log(response, "RESP")
+            if (response.success) {
+                this.images.push(response.images)
+            }
+
         }
 
 

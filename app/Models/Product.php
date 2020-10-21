@@ -13,6 +13,10 @@ class Product extends Model
 
     protected $appends = ['excerpt'];
 
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
     public function variants()
     {
         return $this->belongsToMany(Variant::class ,

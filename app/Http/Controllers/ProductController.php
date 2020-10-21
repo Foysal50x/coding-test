@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductRequest;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
@@ -22,7 +23,7 @@ class ProductController extends Controller
     public function index(ProductFilter $filter)
     {
         return view('products.index')->with([
-            "products" => Product::with('priceVariants')->filter($filter)->paginate(5),
+            "products" => Product::with('priceVariants')->filter($filter)->orderByDesc('created_at')->paginate(5),
             "variants" => Variant::with(['variants' => function($query){
                 return $query->groupBy('variant');
             }])->get()
@@ -41,12 +42,17 @@ class ProductController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
         try {
             DB::transaction(function() use($request){
                 /** @var Product $product */
                 $product = Product::create($request->all());
+                $product->images()->createMany(array_map(function($image){
+                    return [
+                        "file_path" => $image
+                    ];
+                }, $request->input("product_image")));
                 collect($request->input('product_variant'))->each(function($variant) use($product){
                     $variant_id = $variant['option'];
                     $variant_array = array_map(function($name) use ($variant_id) {
@@ -97,7 +103,12 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $product->load('priceVariants');
+        $product->load(['priceVariants', 'variants' => function($query) use ($product){
+            $query->with(['variants' => function($query) use($product){
+                $query->whereProductId($product->id)->groupBy('variant');
+            }])->groupBy('title');
+        }]);
+        //dd($product->toArray());
         $variants = Variant::all();
         return view('products.edit')->with([
             "variants" => $variants,

@@ -24,7 +24,7 @@
                         <h6 class="m-0 font-weight-bold text-primary">Media</h6>
                     </div>
                     <div class="card-body border">
-                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
+                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-success="uploadSuccess"></vue-dropzone>
                     </div>
                 </div>
             </div>
@@ -130,10 +130,10 @@ export default {
             ],
             product_variant_prices: [],
             dropzoneOptions: {
-                url: 'https://httpbin.org/post',
+                url: '/file/upload',
                 thumbnailWidth: 150,
                 maxFilesize: 0.5,
-                headers: {"My-Awesome-Header": "header value"}
+                headers: {"X-CSRF-TOKEN": document.head.querySelector("[name=csrf-token]").content}
             }
         }
     },
@@ -144,11 +144,18 @@ export default {
             this.description = this.product.description;
         },
         initProductVariant(){
-            this.product_variant_prices = [];
+            this.product_variant = this.product.variants.map(variant => {
+               return {
+                    option: variant.id,
+                    tags: variant.variants.map(v => v.variant)
+                };
+            });
+        },
+        initProductVariantPrices(){
             this.product.price_variants.forEach(variant => {
-                const style = variant.style === null ? "" : variant.style.variant;
+                const style = variant.style === null ? "" : `/${variant.style.variant}`;
                 this.product_variant_prices.push({
-                    title: `${variant.size.variant}/${variant.color.variant}/${style}`,
+                    title: `${variant.size.variant}/${variant.color.variant}${style}`,
                     price: variant.price,
                     stock: variant.stock
                 });
@@ -216,6 +223,13 @@ export default {
             })
 
             console.log(product);
+        },
+        uploadSuccess(file, response) {
+            console.log(response, "RESP")
+            if (response.success) {
+                this.images.push(response.images)
+            }
+
         }
 
 
@@ -224,6 +238,7 @@ export default {
         console.log('Component mounted.')
         this.initProduct();
         this.initProductVariant();
+        this.initProductVariantPrices();
     }
 }
 </script>
